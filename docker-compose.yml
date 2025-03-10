@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: nest-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nest_payments
+      MYSQL_USER: nest
+      MYSQL_PASSWORD: nest
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: nest-app
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - '3000:3000'
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: nest
+      DB_PASSWORD: nest
+      DB_NAME: nest_payments
+    volumes:
+      - .:/app  # ✅ Mounts your source code into the container
+      - /app/node_modules  # ✅ Prevents overwriting node_modules
+    command: npm run start:dev  # ✅ Enables hot-reloading in NestJS
+
+volumes:
+  mysql_data:
